@@ -7,6 +7,17 @@ import (
 	"net/http"
 )
 
+func read(p []byte) (n int, err error) {
+	for i := 0; i < len(p); i += 7 {
+		val := rand.Int63()
+		for j := 0; i+j < len(p) && j < 7; j++ {
+			p[i+j] = byte(val)
+			val >>= 8
+		}
+	}
+	return len(p), nil
+}
+
 func hello(w http.ResponseWriter) {
 	fmt.Println("Hello!")
 	// just say hello...
@@ -21,7 +32,7 @@ func hello(w http.ResponseWriter) {
 	// make a 7*9 bytes buffer
 	buf := make([]byte, bufsize)
 	for i := 0; i < len; i += bufsize {
-		rand.Read(buf)
+		read(buf)
 		enc.Write(buf)
 	}
 	enc.Close()
