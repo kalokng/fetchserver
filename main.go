@@ -44,14 +44,14 @@ func EchoServer(ws *websocket.Conn) {
 
 func mainHandle(w http.ResponseWriter, req *http.Request) {
 	header := req.Header
-	proto := header.Get("x-forwarded-proto")
+	proto := header.Get("X-Forwarded-Proto")
 	switch proto {
 	case "ws", "wss":
 	default:
 		hello(w, req)
 		return
 	}
-	ws := header.Get("hello")
+	ws := header.Get("Hello")
 	if ws != "world" {
 		hello(w, req)
 		return
@@ -74,6 +74,7 @@ func getPort() string {
 // This example demonstrates a trivial echo server.
 func main() {
 	bind := fmt.Sprintf("%s:%s", getIP(), getPort())
+	log.Println("Listening on", bind)
 
 	err := http.ListenAndServe(bind, http.HandlerFunc(mainHandle))
 	if err != nil {
