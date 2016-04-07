@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
+	"net/http/httputil"
 )
 
 func read(p []byte) (n int, err error) {
@@ -18,8 +20,23 @@ func read(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func hello(w http.ResponseWriter) {
-	fmt.Println("Hello!")
+func testHeader(w http.ResponseWriter, req *http.Request) {
+	b, err := httputil.DumpRequest(req, true)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("%s\n%v", err, req), http.StatusInternalServerError)
+		return
+	}
+	w.Write(b)
+}
+
+func hello(w http.ResponseWriter, req *http.Request) {
+	log.Println("Hello!")
+
+	if req.URL.Path == "/testheader" {
+		testHeader(w, req)
+		return
+	}
+
 	// just say hello...
 	const avgSize = 2000
 	const avgDev = 500
