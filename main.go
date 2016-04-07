@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/gob"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -16,7 +17,7 @@ func Reply(ws *websocket.Conn, resp *http.Response) {
 	re := obj.NewResponse(resp)
 	err := enc.Encode(re)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }
 
@@ -26,13 +27,13 @@ func EchoServer(ws *websocket.Conn) {
 	var req obj.Request
 	err := dec.Decode(&req)
 	if err != nil {
-		fmt.Println("fail decode", err)
+		log.Println("fail decode", err)
 		Reply(ws, &http.Response{})
 		return
 	}
 	resp, err := http.DefaultClient.Do(req.HTTPRequest())
 	if err != nil {
-		fmt.Println("fail request", err)
+		log.Println("fail request", err)
 		Reply(ws, &http.Response{})
 		return
 	}
@@ -44,7 +45,7 @@ func EchoServer(ws *websocket.Conn) {
 func mainHandle(w http.ResponseWriter, req *http.Request) {
 	header := req.Header
 	proto := header.Get("x-forwarded-proto")
-	fmt.Println(proto)
+	log.Println(header)
 	switch proto {
 	case "ws", "wss":
 	default:
@@ -52,7 +53,6 @@ func mainHandle(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	ws := header.Get("hello")
-	fmt.Println(ws)
 	if ws != "world" {
 		hello(w)
 		return
